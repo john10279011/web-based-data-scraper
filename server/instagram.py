@@ -137,7 +137,7 @@ commentsS = []
 # Main program
 username = "romeoclientandjohn@gmail.com"
 password = "Irene123."
-search_username = input("Enter thhe name of the person to search")
+search_username = input("Enter the name of the person to search ")
 
 
 driver = webdriver.Chrome(ChromeDriverManager().install())

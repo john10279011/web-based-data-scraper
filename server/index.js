@@ -1,8 +1,8 @@
 import express from 'express';
 import { exec } from 'child_process';
-
+import fs from 'fs';
 import { fileURLToPath } from 'url';
-import path,{join} from 'path';
+import path, { join } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,7 +10,8 @@ const __dirname = path.dirname(__filename);
 // Create Express server
 const app = express();
 const port = 3000;
-const client=join(__dirname,"../client")
+const client = join(__dirname, '../client');
+
 // Middleware to parse JSON request body
 app.use(express.json());
 
@@ -18,7 +19,7 @@ app.use(express.json());
 app.post('/', (req, res) => {
   // Get input from req.body
   const input = req.body.input;
-  console.log(input)
+  console.log(input);
 
   // Run the Python script with input from req.body
   const pythonProcess = exec('instagram.py', (error, stdout, stderr) => {
@@ -28,7 +29,29 @@ app.post('/', (req, res) => {
       return;
     }
     console.log(`Python script output: ${stdout}`);
-    res.send('Python script executed successfully');
+
+    // Check if the data.csv file exists
+    fs.access('data.csv', fs.constants.F_OK, (accessError) => {
+      if (accessError) {
+        console.error(`data.csv file not found: ${accessError}`);
+        res.status(500).send('Error generating data.csv');
+      } else {
+        // Send the data.csv file as a downloadable response
+        res.sendFile("./data.csv")
+     
+        
+            // Delete the data.csv file from the server
+            fs.unlink('data.csv', (deleteError) => {
+              if (deleteError) {
+                console.error(`Error deleting data.csv file: ${deleteError}`);
+              } else {
+                console.log('data.csv deleted successfully');
+              }
+            });
+          
+       
+      }
+    });
   });
 
   // Pass input from req.body to the Python script through stdin
@@ -46,7 +69,6 @@ app.post('/', (req, res) => {
 });
 
 app.use(express.static(client));
-
 
 // Start the server
 app.listen(port, () => {
