@@ -1,0 +1,47 @@
+body {
+  background: linear-gradient(to right bottom, #F1FFFA, #CCFCCB, #96E6B3, #568259, #507255);
+  background-size: 400% 400%;
+  /* Increased size to create room for the circular effect */
+  height: 100vh;
+  animation: rotateColors 10s infinite linear;
+  align-items: center;
+  font-size: 120%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.main{
+  background-color: #000000d0;
+  color:#4b4949;
+  width: 100%;
+  padding: 2em;
+  max-width: 420px;
+  border-radius: 30px;
+  margin: 1em;
+
+  
+
+}
+
+
+@keyframes rotateColors {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  20%{
+    background-position: 50% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+  80% {
+    background-position: 50% 50%;
+  }
+  100% {
+    background-position: 20% 50%;
+  }
+}
