@@ -36,20 +36,20 @@ app.post('/', (req, res) => {
         console.error(`data.csv file not found: ${accessError}`);
         res.status(500).send('Error generating data.csv');
       } else {
+        // Set the Content-Disposition header for automatic download
+        res.setHeader('Content-Disposition', 'attachment; filename="data.csv"');
+
         // Send the data.csv file as a downloadable response
-        res.sendFile("./data.csv")
-     
-        
-            // Delete the data.csv file from the server
-            fs.unlink('data.csv', (deleteError) => {
-              if (deleteError) {
-                console.error(`Error deleting data.csv file: ${deleteError}`);
-              } else {
-                console.log('data.csv deleted successfully');
-              }
-            });
-          
-       
+        res.sendFile(path.join(__dirname, 'data.csv'));
+
+        // Delete the data.csv file from the server
+        fs.unlink('data.csv', (deleteError) => {
+          if (deleteError) {
+            console.error(`Error deleting data.csv file: ${deleteError}`);
+          } else {
+            console.log('data.csv deleted successfully');
+          }
+        });
       }
     });
   });
