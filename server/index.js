@@ -16,7 +16,7 @@ const client = join(__dirname, '../client');
 app.use(express.json());
 
 // Define routes
-app.post('/', (req, res) => {
+app.post('/', (req, res, next) => {
   // Get input from req.body
   const input = req.body.input;
   console.log(input);
@@ -30,35 +30,14 @@ app.post('/', (req, res) => {
     }
     console.log(`Python script output: ${stdout}`);
 
-    // Check if the data.csv file exists
-    fs.access('data.csv', fs.constants.F_OK, (accessError) => {
-      if (accessError) {
-        console.error(`data.csv file not found: ${accessError}`);
-        res.status(500).send('Error generating data.csv');
-      } else {
-        // Send the data.csv file as a downloadable response
-        res.sendFile("./data.csv")
-     
-        
-            // Delete the data.csv file from the server
-            fs.unlink('data.csv', (deleteError) => {
-              if (deleteError) {
-                console.error(`Error deleting data.csv file: ${deleteError}`);
-              } else {
-                console.log('data.csv deleted successfully');
-              }
-            });
-          
-       
-      }
-    });
+  
+    scriptFinished();
   });
 
-  // Pass input from req.body to the Python script through stdin
+
   pythonProcess.stdin.write(input);
   pythonProcess.stdin.end();
 
-  // Handle the script's stdout and stderr
   pythonProcess.stdout.on('data', (data) => {
     console.log(`Python script stdout: ${data}`);
   });
@@ -66,7 +45,41 @@ app.post('/', (req, res) => {
   pythonProcess.stderr.on('data', (data) => {
     console.error(`Python script stderr: ${data}`);
   });
+
+
+  function scriptFinished() {
+fs.access('data.csv', fs.constants.F_OK, (accessError) => {
+      if (accessError) {
+        console.error(`data.csv file not found: ${accessError}`);
+        res.status(500).send('Error generating data.csv');
+      } else {
+       // Send the data.csv file as a downloadable response
+      const filePath = path.join(__dirname, 'data.csv');
+      res.setHeader('Content-disposition', 'attachment; filename=data.csv');
+      res.setHeader('Content-type', 'text/csv');
+
+      res.download(filePath, 'data.csv', (downloadError) => {
+        if (downloadError) {
+          console.error(`Error downloading data.csv file: ${downloadError}`);
+        } else {
+          // File download successful, now delete the file from the server
+          fs.unlink(filePath, (deleteError) => {
+            if (deleteError) {
+              console.error(`Error deleting data.csv file: ${deleteError}`);
+            } else {
+              console.log('data.csv deleted successfully');
+            }
+          })}});
+          
+       
+      }
+    });
+
+  }
 });
+
+
+
 
 app.use(express.static(client));
 
