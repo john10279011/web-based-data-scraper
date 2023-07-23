@@ -58,18 +58,19 @@ fs.access('data.csv', fs.constants.F_OK, (accessError) => {
       res.setHeader('Content-disposition', 'attachment; filename=data.csv');
       res.setHeader('Content-type', 'text/csv');
 
-      res.download(filePath, 'data.csv', (downloadError) => {
-        if (downloadError) {
-          console.error(`Error downloading data.csv file: ${downloadError}`);
-        } else {
-          // File download successful, now delete the file from the server
+  var filestream = fs.createReadStream(filePath);
+    filestream.pipe(res);
+ 
+    
+    
+         
           fs.unlink(filePath, (deleteError) => {
             if (deleteError) {
               console.error(`Error deleting data.csv file: ${deleteError}`);
             } else {
               console.log('data.csv deleted successfully');
             }
-          })}});
+          });
           
        
       }
