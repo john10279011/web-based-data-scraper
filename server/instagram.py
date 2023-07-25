@@ -6,6 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 import csv
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
 
 
 def login(driver, username, password):
@@ -139,8 +140,11 @@ username = "romeoclientandjohn@gmail.com"
 password = "Irene123."
 search_username = input("Enter the name of the person to search ")
 
+options = Options()
+options.add_argument("--headless")
 
-driver = webdriver.Chrome(ChromeDriverManager().install())
+
+driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
 try:
     driver.get("https://www.instagram.com")
     driver.implicitly_wait(5)
